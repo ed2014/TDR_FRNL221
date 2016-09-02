@@ -60,6 +60,8 @@ df <- df %>%
 # check
 summary(df)
 
+df$Variable <- as.factor(df$Variable )
+
 # merge with labels
 merge_df <- merge(df,df_layout, by.y = "R_Name", by.x = "Variable")
 
@@ -67,7 +69,8 @@ merge_df <- merge(df,df_layout, by.y = "R_Name", by.x = "Variable")
 merge_df$Value <- ifelse(Value == "NAN", NA, as.numeric(Value))
 merge_df$Plot <- as.factor(merge_df$Plot)
 merge_df$Block <- as.factor(merge_df$Block)
-merge_df$Treat <- as.factor(merge_df$Treat)
+merge_df$N_treat <- as.factor(merge_df$N_treat)
+merge_df$Crop <- as.factor(merge_df$Crop)
 merge_df$ThisDate <- as.Date(merge_df$TIMESTAMP)
 merge_df
 
@@ -77,11 +80,15 @@ str(merge_df)
 summary(merge_df)
 
 # plot
-merge_df %>%
-  #  filter(Block == 1) %>%
-  filter(Measurement == "VWC") %>%
+df <- merge_df %>%
+#  filter(Block == 1 & Crop == "Oat") %>%
+  #filter(Crop == "Oat") %>%
+  filter(Measurement == "VWC") 
+
+
+df %>%
   ggplot(aes(x = TIMESTAMP, y = Value)) + # here we use ggplot
-  geom_line(aes(linetype  = factor(Treat))) +
-  facet_grid(Block+Depth~Crop, scales="free") +
+  geom_point(aes(linetype  = factor(N_treat),colour=factor(Block))) +
+  facet_grid(N_treat+Depth~Crop, scales="free") +
   ylab("Volumetric soil mositure (fractional)") +
   xlab("Date")
